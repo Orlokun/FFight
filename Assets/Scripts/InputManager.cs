@@ -7,17 +7,27 @@ public class InputManager : MonoBehaviour
 {
     #region GlobalVariables
 
+    private struct MatchType
+    {
+        int localPlayers;
+        int matchLength;
+        int localBots;
+    }
+    
+
+
     //Player Variables
     private int numberOfPlayers;
     PlayerController pController;
     CharacterMovementState pActualMovState;
-    
-    
+
+
+
     #endregion
 
 
     #region AwakeFunctions
-        
+
     void Awake()
     {
         SetMatchPlayers();
@@ -124,8 +134,7 @@ public class InputManager : MonoBehaviour
 
     private bool IsPlayerPressingMovement()
     {
-
-
+        
 
 
         bool buttonRightPressed = Input.GetAxisRaw("Horizontal") > 0f;

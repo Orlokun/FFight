@@ -4,25 +4,49 @@ using UnityEngine;
 
 public static class LevelDataManager
 {
-#region GlobalData&Structs
+    #region GlobalData&Structs
 
-    public struct LocalPlayerData
+    private struct LocalPlayerData
     {
         int localId;
         string playerType;
-        PlayerController pController;
-        CharacterMovementState pActualMovState;
-        CharacterJumpState characterJumpState;
+        int healthAmount;
+        int powerAmount;
+
+        public LocalPlayerData(int _localId, string _playerType, int _healthAmount, int _powerAmount)
+        {
+            localId = _localId;
+            playerType = _playerType;
+            healthAmount = _healthAmount;
+            powerAmount = _powerAmount;
+        }
     }
 
-    public struct MatchType
+
+    private struct MatchType
     {
         int lPlayersAmount;
         int lCpuAmount;
-
         int matchLength;
+
+        public MatchType(int _lPlayersAmount, int _lCpuAmount, int _matchLength)
+        {
+            lPlayersAmount = _lPlayersAmount;
+            lCpuAmount = _lCpuAmount;
+            matchLength = _matchLength;
+        }
     }
 
-#endregion
+    #region Getters&Setters
+
+    public static void SetDefaultMatchType()
+    {
+    }
+
+
+    #endregion
+
+
+    #endregion
 
 }
