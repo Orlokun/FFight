@@ -4,42 +4,25 @@ using UnityEngine;
 
 public static class LevelDataManager
 {
-    static int numberOfPlayers;
-    static int matchDuration;
-    static string player1, player2, player3, player4;
-    static Dictionary<int, string> playerInputTypes;
+#region GlobalData&Structs
 
-
-
-
-    public static void StartSettingControllerType(int playerNumber, string cType, bool defaultSetting)
+    public struct LocalPlayerData
     {
-        if (defaultSetting)
-        {
-            SetDefaultControllerTypes(playerNumber);
-        }
-        else
-        {
-            SetIncomingControllertype(playerNumber, cType);
-        }
-    }
-    private static void SetDefaultControllerTypes(int playerNumber)
-    {
-        
+        int localId;
+        string playerType;
+        PlayerController pController;
+        CharacterMovementState pActualMovState;
+        CharacterJumpState characterJumpState;
     }
 
-    private static void SetIncomingControllertype(int playerNumber, string cType)
+    public struct MatchType
     {
+        int lPlayersAmount;
+        int lCpuAmount;
 
+        int matchLength;
     }
 
-    public static int GetNumberOfPlayers()
-    {
-        return numberOfPlayers;
-    }
-    public static void SetNumberOfPlayers(int pAmount)
-    {
-        numberOfPlayers = pAmount;
-    }
+#endregion
 
 }

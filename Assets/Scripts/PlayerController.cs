@@ -21,9 +21,8 @@ public class PlayerController : MonoBehaviour
     BoxCollider2D myCol;
 
     //Movement variables
+
     CharacterMovementState actualMovState;
-    bool mustMove;
-    Vector2 playerInput;
     Vector2 lastPosition;
     float speedX;
     float speedY;

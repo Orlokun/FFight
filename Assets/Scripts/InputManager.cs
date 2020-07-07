@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
 {
@@ -12,14 +13,11 @@ public class InputManager : MonoBehaviour
     CharacterMovementState pActualMovState;
     
     
-    
     #endregion
 
-    private struct MatchPlayerType
-    {
-        Dictionary<int, string> playerTypes;
-    }
-    // Start is called before the first frame update
+
+    #region AwakeFunctions
+        
     void Awake()
     {
         SetMatchPlayers();
@@ -27,13 +25,10 @@ public class InputManager : MonoBehaviour
         pActualMovState = pController.GetPlayerMovState();
     }
 
+    #region SetLocalMultiplayer
     public void SetMatchPlayers()
     {
-        numberOfPlayers = LevelDataManager.GetNumberOfPlayers();
-        if (numberOfPlayers != 0)
-        {
-            CheckNumberOfPlayers();
-        }
+
     }
 
     void CheckNumberOfPlayers()
@@ -74,14 +69,20 @@ public class InputManager : MonoBehaviour
         //Not ready yet
     }
 
-    // Update is called once per frame
+    #endregion
+    #endregion
+
+    #region UpdateFunctions
+
     void Update()
     {
         PlayerHorizontalInputManager();
         PlayerJumpInputManager();
     }
 
+
     #region PlayerHorizontalInput
+
     private void PlayerHorizontalInputManager()
     {
         pActualMovState = pController.GetPlayerMovState();
@@ -116,8 +117,17 @@ public class InputManager : MonoBehaviour
         return Input.GetAxisRaw("Horizontal") >= .1f;
     }
 
+    private void Onmove(InputValue hIValue)
+    {
+        
+    }
+
     private bool IsPlayerPressingMovement()
     {
+
+
+
+
         bool buttonRightPressed = Input.GetAxisRaw("Horizontal") > 0f;
         bool leftButtonPressed = Input.GetAxisRaw("Horizontal") < 0;
         if (buttonRightPressed && leftButtonPressed)
@@ -144,5 +154,5 @@ public class InputManager : MonoBehaviour
     }
 
     #endregion
-
+    #endregion
 }
