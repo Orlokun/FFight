@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -11,7 +12,7 @@ public class PlayerController : MonoBehaviour
 {
 
     #region Global Variables
-    private LevelManager lManager;
+
     private CameraDirector cDirector;
 
     Rigidbody2D rBody;
@@ -44,8 +45,7 @@ public class PlayerController : MonoBehaviour
     bool canAccelerate;
 
     // jumpVariables
-    int maxJumpAmount = 1;
-    int jumpsLeft;
+    CharacterJumpState pJumpState;
     string jumpTag = "Floor";
     bool isGrounded;
     bool justJumped;
@@ -71,12 +71,11 @@ public class PlayerController : MonoBehaviour
     private void SetInitialVariables()
     {
         actualMovState = CharacterMovementState.Idle;
-        lManager = FindObjectOfType<LevelManager>();
+        pJumpState = CharacterJumpState.Grounded;
         cDirector = FindObjectOfType<CameraDirector>();
         playerSizeX = SetPlayersizeX();
         playerSizeY = SetPlayerSizeY();
         groundDistance = playerSizeY / 2 + .02f;
-        maxJumpAmount = 1;
         maxXSpeed = initialMaxSpeed;
     }
 
@@ -101,12 +100,13 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         HorizontalMove();
-        Jump();
+        JumpManaging();
         rBody.velocity = new Vector2(speedX, speedY);
+        CheckGroundedconditions();
         lastPosition = transform.position;
     }
 
-    #region Movement
+    #region HorizontalMovement
     private void HorizontalMove()
     {
         switch (actualMovState)
@@ -121,16 +121,13 @@ public class PlayerController : MonoBehaviour
                 Run();
                 break;
         }
-
         CheckSpeedIsRight();
         speedX = GetActualSpeed() * directionX;
     }
-
     void SetPlayerLocalScaleX()
     {
-        transform.localScale = new Vector3 (directionX, transform.localScale.y, transform.localScale.z);
+        transform.localScale = new Vector3(directionX, transform.localScale.y, transform.localScale.z);
     }
-
     private void Walk()
     {
         if (canAccelerate)
@@ -138,7 +135,6 @@ public class PlayerController : MonoBehaviour
             Accelerate();
         }
     }
-
     private void Run()
     {
         if (canAccelerate)
@@ -146,12 +142,10 @@ public class PlayerController : MonoBehaviour
             Accelerate();
         }
     }
-
     private void Idle()
     {
         Deaccelerate();
     }
-
     private void CheckSpeedIsRight()
     {
         if (directionX > 0 && speedX < 0 || directionX < 0 && speedX > 0)
@@ -159,7 +153,6 @@ public class PlayerController : MonoBehaviour
             speedX *= -1;
         }
     }
-
     private void Accelerate()
     {
         acceleration += .1f;
@@ -168,7 +161,6 @@ public class PlayerController : MonoBehaviour
             canAccelerate = false;
         }
     }
-
     private void Deaccelerate()
     {
         acceleration -= .1f;
@@ -178,26 +170,17 @@ public class PlayerController : MonoBehaviour
             acceleration = 0;
         }
     }
-
     private float GetActualSpeed()
     {
         actualSpeed = maxXSpeed * acceleration;
         return actualSpeed;
     }
-
-    private bool IsPressingLeft()
-    {
-        bool leftButtonPressed = Input.GetAxisRaw("Horizontal") < 0;
-        return leftButtonPressed;
-    }
-
     private void ResetDirectionX()
     {
         directionX *= -1;
         speedX *= -1;
         SetPlayerLocalScaleX();
     }
-
     private void ResetAcceleration()
     {
         acceleration = 0.1f;
@@ -205,36 +188,42 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region Jump
+    #region JumpManager
+    private void JumpManaging()
+    {
+        switch (pJumpState)
+        {
+            case CharacterJumpState.Jumping:
+                Jump();
+                break;
+            case CharacterJumpState.Falling:
+                JustFall();
+                break;
+            case CharacterJumpState.Grounded:
+                TouchGround();
+                break;
+            default:
+                break;
+        }
+    }
     private void Jump()
     {
-        isGrounded = IsItGrounded();
-        playerAnim.SetBool("grounded", isGrounded);
-        if (CheckJumpPressed())
-        {
-            if (isGrounded && !justJumped)
-            {
-                speedY = playerJumpSpeed * directionY;
-                justJumped = true;
-                StartCoroutine(WaitJumpingTime());
-            }
-            else
-            {
-                speedY = rBody.velocity.y * directionY * jumpAcceleration;
-            }
-        }
-
-        else
-        {
-            speedY = rBody.velocity.y;
-        }
+        speedY = playerJumpSpeed * directionY;
+        justJumped = true;
+        StartCoroutine(WaitJumpingTime());
     }
-
-    private bool CheckJumpPressed()
+    private void JustFall()
     {
-        return Input.GetKey(KeyCode.Space);
+        speedY = rBody.velocity.y;
     }
-
+    private void TouchGround()
+    {
+        speedY = rBody.velocity.y;
+    }
+    private void SetJumpState(CharacterJumpState incomingJumpState)
+    {
+        pJumpState = incomingJumpState;
+    }
     private bool IsItGrounded()
     {
         Vector2 myPosition = new Vector2(transform.position.x, transform.position.y);
@@ -249,21 +238,21 @@ public class PlayerController : MonoBehaviour
         Debug.DrawLine(leftRayPosition, new Vector2(leftRayPosition.x, leftRayPosition.y - groundDistance), Color.red);
         Debug.DrawLine(rightRayPosition, new Vector2(rightRayPosition.x, rightRayPosition.y - groundDistance), Color.red);
 
-
         return leftRay.collider != null && leftRay.collider.tag == jumpTag || rightRay.collider != null && rightRay.collider.tag == jumpTag;
-
-        /*if (leftRay.collider != null && leftRay.collider.tag == jumpTag || rightRay.collider != null && rightRay.collider.tag == jumpTag)
-        {
-            //Debug.Log("Touching ground");
-            return true;
-        }
-        //Debug.Log("NOT touching ground");
-        return false;*/
     }
-
-    private bool CheckJumpsLeft()
+    private void CheckGroundedconditions()
     {
-        return jumpsLeft > 0;
+        isGrounded = IsItGrounded();
+        if (!isGrounded)
+        {
+            SetJumpState(CharacterJumpState.Falling);
+            SetAnimState("grounded", false);
+        }
+        else
+        {
+            SetJumpState(CharacterJumpState.Grounded);
+            SetAnimState("grounded", true);
+        }
     }
 
     private IEnumerator WaitJumpingTime()
@@ -320,26 +309,29 @@ public class PlayerController : MonoBehaviour
             SetIncomingState(_movState);
         }
     }
-
     private void SetIdle(CharacterMovementState _movState)
     {
         actualMovState = _movState;
         SetAnimState("idle", true);
     }
-
     private void SetWalking(CharacterMovementState _movState)
     {
         maxXSpeed = initialMaxSpeed;
         actualMovState = _movState;
         SetAnimState("walking", true);
-
     }
-
     private void SetRunning(CharacterMovementState _movState)
     {
         maxXSpeed = runningMaxXSpeed;
         actualMovState = _movState;
         SetAnimState("running", true);
+    }
+    public void ReceiveJumpButton()
+    {
+        if (isGrounded && !justJumped)
+        {
+            SetJumpState(CharacterJumpState.Jumping);
+        }
     }
     #endregion
 
@@ -347,7 +339,7 @@ public class PlayerController : MonoBehaviour
 
     private void SetAnimState(string _var, bool _value)     //Review System
     {
-        switch(_var)
+        switch (_var)
         {
             case "walking":
                 playerAnim.SetBool(_var, _value);
@@ -363,6 +355,9 @@ public class PlayerController : MonoBehaviour
                 playerAnim.SetBool(_var, _value);
                 playerAnim.SetBool("running", !_value);
                 playerAnim.SetBool("walking", !_value);
+                break;
+            case "grounded":
+                playerAnim.SetBool(_var, _value);
                 break;
         }
     }

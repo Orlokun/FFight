@@ -3,35 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-#region GameActions
-
+#region PlayerActions
 public enum CharacterMovementState
 {
     Idle,
     Walking, 
     Running
 }
+public enum CharacterJumpState
+{
+    Jumping,
+    Grounded,
+    Falling
+}
 #endregion
-
 
 public class StageDirector : MonoBehaviour
 {
-    int eventNumber = 0;
+    [SerializeField]
+    private Vector2[] startPositions;
 
-    private List<NPCController> npcs;
-    private Dictionary<int, bool> eventsPlayed;
-     
     // Start is called before the first frame update
     void Awake()
     {
-        //Do Player Management
-        //Do NPC Management
-        npcs = new List<NPCController>();
-        NPCController[] npcControllers = FindObjectsOfType<NPCController>();
-        foreach (NPCController npcController in npcControllers)
-        {
-            npcs.Add(npcController);
-        }
+
     }
 
     private void Update()
@@ -50,8 +45,7 @@ public class StageDirector : MonoBehaviour
     
     private void PlayerActivatedEvent()
     {
-        eventNumber++;
-        StartEvent(eventNumber);
+
     }
 
     private void StartEvent(int eventNumber)
