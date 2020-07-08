@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputManager : MonoBehaviour
+
+public class InputGameMatchInputManager : MonoBehaviour
 {
     #region GlobalVariables
 
-    private struct MatchType
+    private struct MatchVariables
     {
         int localPlayers;
         int matchLength;
         int localBots;
-    }
-    
 
+        private Dictionary<int, string> playerTypes;
+
+    }
 
     //Player Variables
     private int numberOfPlayers;
@@ -30,7 +32,7 @@ public class InputManager : MonoBehaviour
 
     void Awake()
     {
-        SetMatchPlayers();
+        //SetMatchPlayers();
         pController = FindObjectOfType<PlayerController>();
         pActualMovState = pController.GetPlayerMovState();
     }
@@ -86,19 +88,36 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
-        PlayerHorizontalInputManager();
+        //PlayerHorizontalInputManager();
         PlayerJumpInputManager();
     }
 
 
     #region PlayerHorizontalInput
 
-    private void PlayerHorizontalInputManager()
+    private bool CheckPlayerHorizontalMove(Vector2 pMovement)
     {
-        pActualMovState = pController.GetPlayerMovState();
-        if (IsPlayerPressingMovement())
+        return pMovement.x != 0 && pMovement.x > 0 || pMovement.x < 0;
+    }
+
+    private void PressHorizontalInput(InputAction.CallbackContext context)
+    {
+        Vector2 pMovement = context.ReadValue<Vector2>();
+        if (pMovement != Vector2.zero)
         {
-            if (PlayerIsRunning())
+            pActualMovState = CharacterMovementState.Walking;
+
+            pController.ReceiveHorizontalInput(pActualMovState, pMovement);
+
+        }
+
+
+        if (CheckPlayerHorizontalMove(pMovement))
+        {
+            
+
+
+            /*if (PlayerIsRunning())
             {
                 pActualMovState = CharacterMovementState.Running;
             }
@@ -106,8 +125,9 @@ public class InputManager : MonoBehaviour
             {
                 pActualMovState = CharacterMovementState.Walking;
             }
-            pController.ReceiveHorizontalInput(pActualMovState, IsPressingRight());
+            */
         }
+
         else
         {
             if (pController.GetPlayerMovState() != CharacterMovementState.Idle)
@@ -117,33 +137,26 @@ public class InputManager : MonoBehaviour
             }
         }
     }
-    private bool PlayerIsRunning()
+
+    private void PressRun(InputAction.CallbackContext context)
     {
-        return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        pActualMovState = CharacterMovementState.Running;
+        UpdatePlayerState();
     }
 
-    private bool IsPressingRight()
+    private void UpdatePlayerState()
     {
-        return Input.GetAxisRaw("Horizontal") >= .1f;
+
     }
 
-    private void Onmove(InputValue hIValue)
+    private void Onmove(InputAction.CallbackContext context)
     {
-        
+
     }
 
-    private bool IsPlayerPressingMovement()
+    private bool IsPlayerPressingMovement(InputAction.CallbackContext context)
     {
-        
-
-
-        bool buttonRightPressed = Input.GetAxisRaw("Horizontal") > 0f;
-        bool leftButtonPressed = Input.GetAxisRaw("Horizontal") < 0;
-        if (buttonRightPressed && leftButtonPressed)
-        {
-            return false;
-        }
-        return buttonRightPressed == true || leftButtonPressed == true;
+        return true;
     }
     #endregion
 

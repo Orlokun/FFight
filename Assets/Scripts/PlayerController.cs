@@ -26,10 +26,12 @@ public class PlayerController : MonoBehaviour
     Vector2 lastPosition;
     float speedX;
     float speedY;
-    int directionX = 1;                 //Si es positivo estamos mirando a la derecha, si es negativo a la izquierda. 
+    bool lookingRight = true;                 //Si es positivo estamos mirando a la derecha, si es negativo a la izquierda. 
     int directionY = 1;
     float actualSpeed;
     float acceleration;
+    bool canAccelerate;
+
 
     // static variables
     protected static float maxAcceleration = 1f;
@@ -41,7 +43,6 @@ public class PlayerController : MonoBehaviour
     protected static float initialMaxSpeed = 1.1f;
     protected static float runningMaxXSpeed = 1.8f;
     protected static float maxYSpeed = 7f;
-    bool canAccelerate;
 
     // jumpVariables
     CharacterJumpState pJumpState;
@@ -106,6 +107,9 @@ public class PlayerController : MonoBehaviour
     }
 
     #region HorizontalMovement
+
+
+
     private void HorizontalMove()
     {
         switch (actualMovState)
@@ -121,11 +125,24 @@ public class PlayerController : MonoBehaviour
                 break;
         }
         CheckSpeedIsRight();
-        speedX = GetActualSpeed() * directionX;
+        //Check Speed
+        speedX = GetActualSpeed();
     }
+
     void SetPlayerLocalScaleX()
     {
-        transform.localScale = new Vector3(directionX, transform.localScale.y, transform.localScale.z);
+        // Must be fixed!!!!!!!!!!!!!!!!!!!!!!
+        int xLocalScale;
+        if(lookingRight)
+        {
+            xLocalScale = 1;
+        }
+        else
+        {
+            xLocalScale = -1;
+        }
+
+        transform.localScale = new Vector3(xLocalScale, transform.localScale.y, transform.localScale.z);
     }
     private void Walk()
     {
@@ -141,13 +158,14 @@ public class PlayerController : MonoBehaviour
             Accelerate();
         }
     }
+
     private void Idle()
     {
         Deaccelerate();
     }
     private void CheckSpeedIsRight()
     {
-        if (directionX > 0 && speedX < 0 || directionX < 0 && speedX > 0)
+        if (lookingRight && speedX < 0 || lookingRight && speedX > 0)
         {
             speedX *= -1;
         }
@@ -176,7 +194,7 @@ public class PlayerController : MonoBehaviour
     }
     private void ResetDirectionX()
     {
-        directionX *= -1;
+        //Must Check Boolean Data
         speedX *= -1;
         SetPlayerLocalScaleX();
     }
@@ -265,9 +283,9 @@ public class PlayerController : MonoBehaviour
 
     #region Getters & Setters
 
-    public int GetPlayerDirection()
+    public bool GetPlayerDirection()
     {
-        return directionX;
+        return lookingRight;
     }
 
     public CharacterMovementState GetPlayerMovState()
@@ -295,9 +313,9 @@ public class PlayerController : MonoBehaviour
 
     #region InputReceive
 
-    public void ReceiveHorizontalInput(CharacterMovementState _movState, bool pressedRight)
+    public void ReceiveHorizontalInput(CharacterMovementState _movState, Vector2 _horizontalInput)
     {
-        if (pressedRight && directionX == -1 || !pressedRight && directionX == 1)
+        if (_horizontalInput.x > 0 && !lookingRight || _horizontalInput.x < 0 && lookingRight)
         {
             cDirector.PlayerChangedDirection();
             ResetDirectionX();          //Check whatItDoes{
@@ -321,9 +339,12 @@ public class PlayerController : MonoBehaviour
     }
     private void SetRunning(CharacterMovementState _movState)
     {
-        maxXSpeed = runningMaxXSpeed;
-        actualMovState = _movState;
-        SetAnimState("running", true);
+        if (_movState != actualMovState)
+        {
+            maxXSpeed = runningMaxXSpeed;
+            actualMovState = _movState;
+            SetAnimState("running", true);
+        }
     }
     public void ReceiveJumpButton()
     {

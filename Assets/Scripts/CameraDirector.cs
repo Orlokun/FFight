@@ -75,14 +75,7 @@ public class CameraDirector : MonoBehaviour
 
     private bool WhereIsPlayerLooking()
     {
-        if (pController.GetPlayerDirection() > 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return pController.GetPlayerDirection();
     }
 
     #endregion

@@ -37,16 +37,20 @@ public static class LevelDataManager
         }
     }
 
+    private static MatchType actualMatchType;
+
     #region Getters&Setters
 
     public static void SetDefaultMatchType()
     {
+        int defaultPlayers = 1;
+        int defaultCpuAmount = 1;
+        int defaultMatchLength = 45;
+
+        actualMatchType = new MatchType(defaultPlayers, defaultCpuAmount, defaultMatchLength);
     }
 
-
     #endregion
-
-
     #endregion
-
 }
+
