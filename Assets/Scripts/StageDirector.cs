@@ -23,8 +23,14 @@ public class StageDirector : MonoBehaviour
     [SerializeField]
     private Vector2[] startPositions;
 
+
     // Start is called before the first frame update
     void Awake()
+    {
+        GetInitialInfoFromLevelDataManager();
+    }
+
+    private void GetInitialInfoFromLevelDataManager()
     {
 
     }

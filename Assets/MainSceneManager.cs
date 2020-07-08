@@ -5,44 +5,67 @@ using UnityEngine.InputSystem;
 
 public class MainSceneManager : MonoBehaviour
 {
+    //Initial Info
     [SerializeField]
     private GameObject[] buttons;
+    [SerializeField]
+    private Vector2[] mainbuttonPositions;
+    
+
     private int activeButton;
 
 
+    //DataForMatch
+    private int localPlayers;
+    private int totalPlayers;
+
     private void Awake()
     {
-        SetDefaultParameters();   
+        CheckBasicParameters();
+        SetPositionOfButtons();   
+    }
+    
+    private void SetPositionOfButtons()
+    {
+        for (int i = 0; i)
     }
 
-    private void SetDefaultParameters()
+
+    #region MenuNavigation
+    public void ChangeButtonUp(InputAction.CallbackContext context)
     {
-        activeButton = 2;
+        activeButton = GetSafeActiveButtonNumber(1);
+        ChangeActiveButton(activeButton);
+    }
+    public void ChangeButtondown(InputAction.CallbackContext context)
+    {
+        activeButton = GetSafeActiveButtonNumber(-1);
+        ChangeActiveButton(activeButton);
     }
 
-    public void ChangeActiveButton(InputAction.CallbackContext context)
+    private int GetSafeActiveButtonNumber(int _newbuttonNumber)
     {
-        Vector2 incomingJoystick = context.ReadValue<Vector2>();
+        activeButton += _newbuttonNumber;
+        // THIS HARDWIRED NUMBERS MUST BE CORRECTLY SET
+        if (activeButton >= 3)
         {
-            if (incomingJoystick.y != 0 && incomingJoystick.y >0)
-            {
-                ChangeActiveButton(1);
-            }
-            else if (incomingJoystick.y !=0 && incomingJoystick.y < 0)
-            {
-                ChangeActiveButton(-1);
-            }
+            activeButton = 0;
         }
+        else if (activeButton <= -1)
+        {
+            activeButton = 2;
+        }
+        return activeButton;
     }
 
-    private void ChangeActiveButton(int incomingNewButton)
+    private void ChangeActiveButton(int activeButton)
     {
-
+        ChangeParticlePosition(activeButton);
     }
 
+    #endregion
     private void OnEnable()
     {
         
     }
-
 }

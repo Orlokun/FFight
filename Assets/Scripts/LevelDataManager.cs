@@ -1,29 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public static class LevelDataManager
 {
     #region GlobalData&Structs
 
-    private struct LocalPlayerData
-    {
-        int localId;
-        string playerType;
-        int healthAmount;
-        int powerAmount;
-
-        public LocalPlayerData(int _localId, string _playerType, int _healthAmount, int _powerAmount)
-        {
-            localId = _localId;
-            playerType = _playerType;
-            healthAmount = _healthAmount;
-            powerAmount = _powerAmount;
-        }
-    }
-
-
-    private struct MatchType
+    public struct MatchType
     {
         int lPlayersAmount;
         int lCpuAmount;
@@ -49,8 +31,22 @@ public static class LevelDataManager
 
         actualMatchType = new MatchType(defaultPlayers, defaultCpuAmount, defaultMatchLength);
     }
-
     #endregion
     #endregion
 }
 
+public class LocalPlayerData
+{
+    int localId;
+    string playerType;
+    int healthAmount;
+    int powerAmount;
+
+    public LocalPlayerData(int _localId, string _playerType, int _healthAmount, int _powerAmount)
+    {
+        localId = _localId;
+        playerType = _playerType;
+        healthAmount = _healthAmount;
+        powerAmount = _powerAmount;
+    }
+}

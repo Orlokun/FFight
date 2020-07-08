@@ -10,20 +10,28 @@ public class InputGameMatchInputManager : MonoBehaviour
 
     private struct MatchVariables
     {
+        int totalFighters;
         int localPlayers;
         int matchLength;
-        int localBots;
 
         private Dictionary<int, string> playerTypes;
+        
+        public MatchVariables(int _tfighters, int _lPlayers, int _mLength, List<LocalPlayerData> _pTypes)
+        {
+            totalFighters = _tfighters;
+            localPlayers = _lPlayers;
+            matchLength = _mLength;
 
+            playerTypes = new Dictionary<int, string>();
+            foreach()
+        }
     }
 
+    private MatchVariables mVariables;
     //Player Variables
     private int numberOfPlayers;
     PlayerController pController;
     CharacterMovementState pActualMovState;
-
-
 
     #endregion
 
@@ -38,9 +46,9 @@ public class InputGameMatchInputManager : MonoBehaviour
     }
 
     #region SetLocalMultiplayer
-    public void SetMatchPlayers()
+    public void SetMatchData()
     {
-
+        mVariables
     }
 
     void CheckNumberOfPlayers()
@@ -177,4 +185,6 @@ public class InputGameMatchInputManager : MonoBehaviour
 
     #endregion
     #endregion
+
+
 }
